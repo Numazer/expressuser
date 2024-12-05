@@ -20,3 +20,5 @@ app.get('/register', (res, req) => {showRegister(res, req);});
 
 // envoie le traitement des données de formulaire d'enregistrement
 app.post('/register', (res, req) => {traitRegister(res, req);});
+
+app.post('/login', (res, req) => {traitLogin(res, req);});

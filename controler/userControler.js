@@ -13,11 +13,6 @@ function showLogin(req, res) {
     res.send(loginView());
 }
 
-// fonction qui lance le traitement des données du formulaire de connexion
-function traitLogin(req, res) {
-    const {username, password} = req.body;
-}
-
 // fonction qui lance le traitement des données du formulaire d'enregistrement
 function traitRegister(req, res) {
     const {username, password} = req.body;
@@ -30,6 +25,22 @@ function traitRegister(req, res) {
         } else {
             console.log('user success', newUser);
             res.send('register success');
+        }
+    });
+}
+
+// fonction qui lance le traitement des données du formulaire de connexion
+function traitLogin(req, res) {
+    const {username, password} = req.body;
+    const newUser= new User(username, password);
+    const query = 'SELECT * FROM users WHERE username = ? AND password = ?'
+    db.all(query, [username, password], function(err){
+        if(err){
+            console.error('echec connexion', err.message);
+            res.send('error');
+        } else {
+            console.log('user success', newUser);
+            res.send('connexion success');
         }
     });
 }
