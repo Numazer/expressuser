@@ -1,13 +1,17 @@
+require('dotenv').config();
 const express = require('express');
 const app = express();
-const {showLogin, showRegister, traitRegister, traitLogin} = require('./controler/userControler');
+const {showLogin, showRegister, traitRegister, traitLogin, showProfile} = require('./controler/userControler');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const jwt = require('jsonwebtoken');  // Importer jsonwebtoken
+const authenticateToken = require('./middleware.js/middleWare')
+const cookieParser = require('cookie-parser');
+
 
 // créer une session
 app.use(session({
-    secret: 'manuKey',  // Une clé secrète utilisée pour signer les cookies de session
+    secret: process.env.JWT_SECRET,  // Une clé secrète utilisée pour signer les cookies de session
     resave: false,                // Ne pas sauver la session si elle n'a pas été modifiée
     saveUninitialized: true,      // Sauvegarder une session non initialisée (si elle est vide)
     cookie: { secure: false }     // Ne nécessite pas une connexion HTTPS pour l'exemple (en production, utilisez `secure: true`)
@@ -18,6 +22,8 @@ app.use(express.json());
 
 // parcours le Json
 app.use(bodyParser.urlencoded({extended : true}));
+
+app.use(cookieParser());
 
 // écoute le port 3000 -> accueil
 app.listen(3000, (req, res) => {console.log('coucou')});
@@ -33,25 +39,12 @@ app.post('/register', (req, res) => {traitRegister(req, res);});
 
 // envoie le traitement des données de formulaire de connexion
 app.post('/login', (req, res) => {traitLogin(req, res);});
-
-// Middleware pour vérifier le JWT dans les requêtes protégées
-function authenticateToken(req, res, next) {
-  const token = req.header('Authorization') && req.header('Authorization').split(' ')[1]; // Récupère le token de l'en-tête Authorization
-  if (!token) {
-      return res.status(403).send('Access denied');
-  }
-
-  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-      if (err) {
-          return res.status(403).send('Invalid or expired token');
-      }
-      req.user = user;
-      next();
-  });
-}
-
+ 
 // Exemple d'une route protégée
-app.get('/profile', authenticateToken, (req, res) => {
-  res.send(`Hello ${req.user.username}, this is your profile!`);
-});
+app.get('/profile', authenticateToken, (req, res) => {showProfile(req, res);});
 
+app.get('/logout', (req, res) => {
+  // Supprimer le cookie contenant le token JWT
+  res.clearCookie('token');
+  res.send('Vous êtes maintenant déconnecté.');
+});
