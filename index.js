@@ -3,6 +3,7 @@ const app = express();
 const {showLogin, showRegister, traitRegister, traitLogin} = require('./controler/userControler');
 const bodyParser = require('body-parser');
 const session = require('express-session');
+const jwt = require('jsonwebtoken');  // Importer jsonwebtoken
 
 // créer une session
 app.use(session({
@@ -32,3 +33,25 @@ app.post('/register', (req, res) => {traitRegister(req, res);});
 
 // envoie le traitement des données de formulaire de connexion
 app.post('/login', (req, res) => {traitLogin(req, res);});
+
+// Middleware pour vérifier le JWT dans les requêtes protégées
+function authenticateToken(req, res, next) {
+  const token = req.header('Authorization') && req.header('Authorization').split(' ')[1]; // Récupère le token de l'en-tête Authorization
+  if (!token) {
+      return res.status(403).send('Access denied');
+  }
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+      if (err) {
+          return res.status(403).send('Invalid or expired token');
+      }
+      req.user = user;
+      next();
+  });
+}
+
+// Exemple d'une route protégée
+app.get('/profile', authenticateToken, (req, res) => {
+  res.send(`Hello ${req.user.username}, this is your profile!`);
+});
+

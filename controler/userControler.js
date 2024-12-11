@@ -35,30 +35,36 @@ function traitRegister(req, res) {
     });
 }
 
-// fonction qui lance le traitement des données du formulaire de connexion
+// Fonction qui traite la connexion
 function traitLogin(req, res) {
-    const {username, password} = req.body;
-    const newUser= new User(username, password);
-    const query = 'SELECT * FROM users WHERE username = ?'
-    db.get(query, [newUser.username], function(err, row){
-        if(err){
-            console.error('echec connexion', err.message);
-            res.send('error');
+    const { username, password } = req.body;
+    const query = 'SELECT * FROM users WHERE username = ?';
+
+    db.get(query, [username], (err, row) => {
+        if (err) {
+            console.error('Error during login:', err.message);
+            return res.status(500).send('Error occurred during login');
         }
-        if(row){
-            bcrypt.compare(password, row.password, (err, result) => {
-                if(err){
-                    console.log("mdp non correspondant");
-                    res.send('echec comparaison');
-                } else if(result){
-                    console.log(newUser, 'Connecté');
-                    res.send('bienvenue');
-                }else {
-                    console.log('mauvais mdp');
-                    res.send('mot de passe éronné');
-                }
-            } );
+
+        if (!row) {
+            return res.status(404).send('User not found');
         }
+
+        // Comparer le mot de passe avec bcrypt
+        bcrypt.compare(password, row.password, (err, result) => {
+            if (err) {
+                return res.status(400).send('Invalid password');
+            }
+
+            if (result) {
+                // Si la connexion est réussie, générez un JWT
+                const user = { username: row.username, id: row.id };
+                const token = jwt.sign(user, process.env.JWT_SECRET, { expiresIn: '1h' }); // Le token expire dans 1 heure
+                res.json({ token });  // Envoi du token au client
+            } else {
+                res.status(400).send('Invalid password');
+            }
+        });
     });
 }
 
