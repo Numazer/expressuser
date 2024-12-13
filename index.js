@@ -1,13 +1,17 @@
 require('dotenv').config();
 const express = require('express');
 const app = express();
-const {showLogin, showRegister, traitRegister, traitLogin, showProfile} = require('./controler/userControler');
+const {showLogin, showRegister, traitRegister, traitLogin} = require('./controler/userControler');
+const { showProfile, showDepot, traitDepot, supprDepot, afficherModifierAnnonce, modifierAnnonce} = require('./controler/appControler');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const jwt = require('jsonwebtoken');  // Importer jsonwebtoken
-const authenticateToken = require('./middleware.js/middleWare')
+const authenticateToken = require('./middleware.js/middleWare');
 const cookieParser = require('cookie-parser');
+const isAdmin = require('./middleware.js/middleWare');
 
+
+app.use(express.static('public'));
 
 // créer une session
 app.use(session({
@@ -47,4 +51,22 @@ app.get('/logout', (req, res) => {
   // Supprimer le cookie contenant le token JWT
   res.clearCookie('token');
   res.send('Vous êtes maintenant déconnecté.');
+});
+
+app.get('/depot', (req, res) => {
+  showDepot(req, res);
+});
+
+app.post('/depot', (req, res) => {traitDepot(req, res);});
+
+app.post('/supprDepot', supprDepot);
+
+
+app.get('/modifierAnnonce/:adId', afficherModifierAnnonce);
+
+
+app.post('/modifierAnnonce', modifierAnnonce);
+
+app.get('/admin', isAdmin, (req, res) => {
+  res.send('Page d\'administration');
 });

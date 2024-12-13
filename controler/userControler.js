@@ -4,8 +4,8 @@ const User = require('../modele/User');
 const registerView = require('../view/registerView');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');  // Importer jsonwebtoken
-const profileView = require('../view/profileView');
 const cookieParser = require('cookie-parser');
+
 
 
 // fonction qui affiche le formulaire d'inscription
@@ -24,8 +24,9 @@ function traitRegister(req, res) {
     const {username, password} = req.body;
     bcrypt.hash(password, saltRounds, (err, hashedPassword) => {
         const newUser = new User(username, hashedPassword);
-        const query = 'INSERT INTO users (username, password) VALUES (?,?)';
-        db.run(query, [newUser.username, newUser.password], 
+        const role = 'utilisateur';
+        const query = 'INSERT INTO users (username, password, role) VALUES (?,?,?)';
+        db.run(query, [newUser.username, newUser.password, newUser.role], 
             function(err){
             if(err){
                 console.error('echec enregistrement', err.message);
@@ -61,7 +62,7 @@ function traitLogin(req, res) {
   
         if (result) {
           // Si la connexion est réussie, générez un JWT
-          const user = { username: row.username, id: row.id };
+          const user = { username: row.username, id: row.id, role : row.role };
           const token = jwt.sign(user, process.env.JWT_SECRET, { expiresIn: '1h' });
   
           // Envoyer le token dans un cookie avec une expiration de 1h
@@ -91,29 +92,5 @@ function traitLogin(req, res) {
     });
   }
   
-  function showProfile(req, res) {
-    // Assurez-vous que l'utilisateur est authentifié
-    if (!req.user) {
-        return res.status(401).send('User not authenticated');
-    }
 
-    const userId = req.user.id;  // L'ID de l'utilisateur provient du token
-
-    // Requête pour récupérer les informations de l'utilisateur depuis la base de données
-    const query = 'SELECT * FROM users WHERE id = ?';
-    db.get(query, [userId], (err, row) => {
-        if (err) {
-            console.error('Error fetching user data:', err.message);
-            return res.status(500).send('Error occurred while fetching user data');
-        }
-
-        if (!row) {
-            return res.status(404).send('User not found');
-        }
-
-        // Passe les données de l'utilisateur à la vue
-        res.send(profileView(row));  // Passe l'objet `row` (l'utilisateur récupéré) à la fonction profileView
-    });
-}
-
-module.exports = {showLogin, showRegister, traitRegister, traitLogin, showProfile};
+module.exports = {showLogin, showRegister, traitRegister, traitLogin};

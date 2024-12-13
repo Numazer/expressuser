@@ -4,7 +4,7 @@ function loginView() {
                     <form method='POST' action='/login'>
                         <input type='text' placeholder='name' name='username'/>
                         <input type='text' placeholder='password' name='password'/>
-                        <button type='submit'>envoyer</button>
+                        <button type='submit'>connexion</button>
                     </form>
                 </body>
             </html>`
