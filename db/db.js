@@ -10,7 +10,7 @@ const db = new sqlite3.Database('./database.sqlite', (err) => {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT NOT NULL,
             password TEXT NOT NULL,
-            role TEXT DEFAULT 'utilisateur'
+            role TEXT DEFAULT "utilisateur"
         )`);
 
         // Création de la table `annonces` si elle n'existe pas déjà
@@ -22,7 +22,9 @@ const db = new sqlite3.Database('./database.sqlite', (err) => {
             user_id INTEGER,
             FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
         )`);
+        
 
+        db.run(`UPDATE users SET role = 'admin' WHERE id = 9;`);
     }
 });
 

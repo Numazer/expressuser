@@ -24,7 +24,6 @@ function traitRegister(req, res) {
     const {username, password} = req.body;
     bcrypt.hash(password, saltRounds, (err, hashedPassword) => {
         const newUser = new User(username, hashedPassword);
-        const role = 'utilisateur';
         const query = 'INSERT INTO users (username, password, role) VALUES (?,?,?)';
         db.run(query, [newUser.username, newUser.password, newUser.role], 
             function(err){
