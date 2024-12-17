@@ -2,7 +2,8 @@ require('dotenv').config();
 const express = require('express');
 const app = express();
 const {showLogin, showRegister, traitRegister, traitLogin} = require('./controler/userControler');
-const { showProfile, showDepot, traitDepot, supprDepot, afficherModifierAnnonce, modifierAnnonce} = require('./controler/appControler');
+const {showProfile, showDepot, traitDepot, supprDepot, afficherModifierAnnonce, modifierAnnonce, showAnnonce} = require('./controler/appControler');
+const homeView = require('./view/homeView');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const jwt = require('jsonwebtoken');  // Importer jsonwebtoken
@@ -50,7 +51,7 @@ app.get('/profile', authenticateToken, (req, res) => {showProfile(req, res);});
 app.get('/logout', (req, res) => {
   // Supprimer le cookie contenant le token JWT
   res.clearCookie('token');
-  res.send('Vous êtes maintenant déconnecté.');
+  res.redirect('/login');
 });
 
 app.get('/depot', (req, res) => {
@@ -70,3 +71,11 @@ app.post('/modifierAnnonce', modifierAnnonce);
 app.get('/admin', isAdmin, (req, res) => {
   res.send('Page d\'administration');
 });
+
+app.get('/home', (req, res) => {
+  showAnnonce(req, res);
+});
+
+// app.get('/', (req, res) => {
+//   res.redirect('/home');
+// });

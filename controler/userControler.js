@@ -23,7 +23,7 @@ function traitRegister(req, res) {
     const saltRounds = 10;
     const {username, password} = req.body;
     bcrypt.hash(password, saltRounds, (err, hashedPassword) => {
-        const newUser = new User(username, hashedPassword);
+        const newUser = new User(username, hashedPassword, "utilisateur");
         const query = 'INSERT INTO users (username, password, role) VALUES (?,?,?)';
         db.run(query, [newUser.username, newUser.password, newUser.role], 
             function(err){
@@ -32,11 +32,12 @@ function traitRegister(req, res) {
                 res.send('error');
             } else {
                 console.log('user success', newUser);
-                res.send('register success');
+                // res.send('register success');
+                return res.redirect('/login');
             }
     })
     });
-}
+};
 
 // Fonction qui traite la connexion
 function traitLogin(req, res) {
@@ -69,7 +70,7 @@ function traitLogin(req, res) {
             httpOnly: true, // Empêche l'accès au cookie via JavaScript côté client (sécurise contre XSS)
             secure: process.env.NODE_ENV === 'production', // True si en HTTPS (en production)
             maxAge: 3600000 // Expire après 1 heure (en millisecondes)
-          });
+          });console.log("token stocké dans le cookie", token);
 
           res.cookie('username', username, { 
             httpOnly: true, 

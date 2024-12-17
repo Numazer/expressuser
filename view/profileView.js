@@ -40,10 +40,24 @@ function profileView(user, annonces) {
                     background-color: red;
                     color: white;
                 }
+                
+                .btn-delete:hover {
+                    background-color:rgb(255, 92, 89);
+                }
+
+                .btn-edit:hover {
+                    background-color:rgb(96, 99, 255);
+                }
+
                 .btn-edit {
                     background-color: blue;
                     color: white;
                 }
+
+                .btn-update:hover {
+                    background-color:rgb(19, 169, 46);
+                }
+
                 .btn-update {
                     background-color: green;
                     color: white;
@@ -80,7 +94,20 @@ function profileView(user, annonces) {
                 <ul>
                     <li><strong>Nom d'utilisateur:</strong> ${user.username}</li>
                 </ul>
+           
+                <button onclick="window.location.href='/depot'" class="w-full py-3 mb-4 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            Déposer une nouvelle annonce
+            </button>
+
+            <button onclick="window.location.href='/logout'" class="w-full py-3 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500">
+            Se déconnecter
+            </button>
+
+            <button onclick="window.location.href='/home'" class="w-full py-3 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500">
+            page d'accueil
+            </button>
             </div>
+
 
             <div class="container">
                 <h2>Vos Annonces :</h2>
@@ -123,11 +150,7 @@ function profileView(user, annonces) {
                 `).join('')}
             </div>
 
-            <div class="container">
-                <a href="/depot">Déposer une nouvelle annonce</a>
-                <a href="/logout">Se déconnecter</a>
-            </div>
-
+        
             <script>
                 // Fonction pour ouvrir le formulaire de modification
                 function openEditForm(adId, title, description, price) {

@@ -4,6 +4,7 @@ const cookieParser = require('cookie-parser');
 const jwt = require('jsonwebtoken');  // Importer jsonwebtoken
 const bcrypt = require('bcrypt');
 const db = require('../db/db');
+const homeView = require('../view/homeView');
 
 
 function showProfile(req, res) {
@@ -157,5 +158,19 @@ function modifierAnnonce(req, res) {
     });
 }
 
+function showAnnonce(req, res) {
 
-module.exports = { showProfile, showDepot, traitDepot, supprDepot, afficherModifierAnnonce, modifierAnnonce}
+        // Récupérer les annonces de l'utilisateur
+        const query = 'SELECT * FROM annonces';
+        db.all(query, (err, annonces) => {
+            if (err) {
+                return res.status(500).send('Erreur lors de la récupération des annonces');
+            }
+
+            // Passer les données de l'utilisateur et des annonces à la vue
+            res.send(homeView(annonces)); // Afficher la vue du profil avec les annonces
+        });
+    };
+
+
+module.exports = { showProfile, showDepot, traitDepot, supprDepot, afficherModifierAnnonce, modifierAnnonce, showAnnonce}
