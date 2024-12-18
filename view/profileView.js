@@ -94,6 +94,11 @@ function profileView(user, annonces) {
                 <ul>
                     <li><strong>Nom d'utilisateur:</strong> ${user.username}</li>
                 </ul>
+
+                 <!-- Bouton d'accès à l'administration (visible uniquement pour les admins) -->
+            ${user && user.role === 'admin' ? `
+                <button onclick="window.location.href='/admin'" class="btn btn-login">page administrateur</button>
+            ` : ''}
            
                 <button onclick="window.location.href='/depot'" class="w-full py-3 mb-4 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
             Déposer une nouvelle annonce
@@ -102,11 +107,16 @@ function profileView(user, annonces) {
             <button onclick="window.location.href='/logout'" class="w-full py-3 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500">
             Se déconnecter
             </button>
+                
 
             <button onclick="window.location.href='/home'" class="w-full py-3 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500">
             page d'accueil
             </button>
+
+            <button onclick="window.location.href='/favorites'" class="btn btn-favorites">Voir mes favoris</button>
             </div>
+
+            
 
 
             <div class="container">

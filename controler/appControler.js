@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');  // Importer jsonwebtoken
 const bcrypt = require('bcrypt');
 const db = require('../db/db');
 const homeView = require('../view/homeView');
+const favoritesView = require('../view/favoriteView');
 
 
 function showProfile(req, res) {
@@ -19,15 +20,15 @@ function showProfile(req, res) {
             return res.status(403).send('Token invalide');
         }
 
-        // Récupérer les annonces de l'utilisateur
-        const query = 'SELECT * FROM annonces';
-        db.all(query, (err, annonces) => {
+        // Récupérer les annonces de l'utilisateur à partir de la base de données
+        const query = 'SELECT * FROM annonces WHERE user_id = ?';
+        db.all(query, [user.id], (err, annonces) => {
             if (err) {
                 return res.status(500).send('Erreur lors de la récupération des annonces');
             }
 
             // Passer les données de l'utilisateur et des annonces à la vue
-            res.send(profileView(user, annonces)); // Afficher la vue du profil avec les annonces
+            res.send(profileView(user, annonces)); // Afficher la vue du profil avec les annonces de l'utilisateur
         });
     });
 }
@@ -58,7 +59,7 @@ function traitDepot(req, res) {
         db.run(query, [title, description, price, user.id], function(err) {
             if (err) {
                 console.error('Erreur lors de l\'ajout de l\'annonce:', err.message);
-                return res.status(500).send('Erreur lors de l\'ajout de l\'annonce');
+                return res.status(500).send('Erreur lors de l\'ajout de l\'annonce');1
             }
 
             console.log('Annonce ajoutée avec succès:', this.lastID);
@@ -159,18 +160,80 @@ function modifierAnnonce(req, res) {
 }
 
 function showAnnonce(req, res) {
+    const token = req.cookies.token;  // Récupérer le token depuis les cookies
 
-        // Récupérer les annonces de l'utilisateur
-        const query = 'SELECT * FROM annonces';
-        db.all(query, (err, annonces) => {
+    // Vérifier si l'utilisateur est connecté
+    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+        if (err) {
+            // Si l'utilisateur n'est pas connecté, afficher les annonces validées seulement
+            return db.all('SELECT * FROM annonces WHERE status = "validée"', (err, annonces) => {
+                if (err) {
+                    return res.status(500).send('Erreur lors de la récupération des annonces');
+                }
+                res.send(homeView(annonces, null));  // Passer `null` pour `user` si non connecté
+            });
+        }
+
+        // Si l'utilisateur est connecté, afficher les annonces validées avec personnalisation
+        db.all('SELECT * FROM annonces WHERE status = "validée"', (err, annonces) => {
             if (err) {
                 return res.status(500).send('Erreur lors de la récupération des annonces');
             }
-
-            // Passer les données de l'utilisateur et des annonces à la vue
-            res.send(homeView(annonces)); // Afficher la vue du profil avec les annonces
+            res.send(homeView(annonces, user));  // Passer `user` pour personnaliser la vue
         });
-    };
+    });
+}
 
+// Fonction pour ajouter une annonce aux favoris
+function addFavorite(req, res) {
+    const userId = req.user.id;  // ID de l'utilisateur connecté
+    const annonceId = req.params.annonceId;  // ID de l'annonce à ajouter aux favoris
 
-module.exports = { showProfile, showDepot, traitDepot, supprDepot, afficherModifierAnnonce, modifierAnnonce, showAnnonce}
+    const query = 'INSERT INTO favoris (user_id, annonce_id) VALUES (?, ?)';
+    
+    db.run(query, [userId, annonceId], function(err) {
+        if (err) {
+            console.error('Erreur lors de l\'ajout aux favoris:', err.message);
+            return res.status(500).send('Erreur lors de l\'ajout aux favoris');
+        }
+        res.redirect('/home');  // Redirige vers la page d'accueil après avoir ajouté aux favoris
+    });
+}
+
+// Fonction pour supprimer une annonce des favoris
+function removeFavorite(req, res) {
+    const userId = req.user.id;  // ID de l'utilisateur connecté
+    const annonceId = req.params.annonceId;  // ID de l'annonce à supprimer des favoris
+
+    const query = 'DELETE FROM favoris WHERE user_id = ? AND annonce_id = ?';
+    
+    db.run(query, [userId, annonceId], function(err) {
+        if (err) {
+            console.error('Erreur lors de la suppression des favoris:', err.message);
+            return res.status(500).send('Erreur lors de la suppression des favoris');
+        }
+        res.redirect('/favorites');  // Redirige vers la page d'accueil après avoir supprimé des favoris
+    });
+}
+
+// Fonction pour afficher les favoris de l'utilisateur
+function showFavorites(req, res) {
+    const userId = req.user.id;  // ID de l'utilisateur connecté
+
+    const query = `
+        SELECT annonces.* FROM annonces
+        INNER JOIN favoris ON favoris.annonce_id = annonces.id
+        WHERE favoris.user_id = ?
+    `;
+    
+    db.all(query, [userId], (err, rows) => {
+        if (err) {
+            console.error('Erreur lors de l\'affichage des favoris:', err.message);
+            return res.status(500).send('Erreur lors de l\'affichage des favoris');
+        }
+        
+        res.send(favoritesView(rows));  // Envoyer une vue avec les annonces favorites
+    });
+}
+
+module.exports = { showProfile, showDepot, traitDepot, supprDepot, afficherModifierAnnonce, modifierAnnonce, showAnnonce, addFavorite, removeFavorite, showFavorites}

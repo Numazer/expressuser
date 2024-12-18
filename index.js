@@ -2,14 +2,15 @@ require('dotenv').config();
 const express = require('express');
 const app = express();
 const {showLogin, showRegister, traitRegister, traitLogin} = require('./controler/userControler');
-const {showProfile, showDepot, traitDepot, supprDepot, afficherModifierAnnonce, modifierAnnonce, showAnnonce} = require('./controler/appControler');
+const {showProfile, showDepot, traitDepot, supprDepot, afficherModifierAnnonce, modifierAnnonce, showAnnonce, addFavorite, removeFavorite, showFavorites} = require('./controler/appControler');
 const homeView = require('./view/homeView');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const jwt = require('jsonwebtoken');  // Importer jsonwebtoken
 const authenticateToken = require('./middleware.js/middleWare');
 const cookieParser = require('cookie-parser');
-const isAdmin = require('./middleware.js/middleWare');
+const isAdmin = require('./middleware.js/isAdmin');
+const { showAdminPage, approveAnnonce, rejectAnnonce } = require('./controler/adminControler');
 
 
 app.use(express.static('public'));
@@ -69,13 +70,25 @@ app.get('/modifierAnnonce/:adId', afficherModifierAnnonce);
 app.post('/modifierAnnonce', modifierAnnonce);
 
 app.get('/admin', isAdmin, (req, res) => {
-  res.send('Page d\'administration');
+ showAdminPage(req, res);
 });
 
 app.get('/home', (req, res) => {
   showAnnonce(req, res);
 });
 
-// app.get('/', (req, res) => {
-//   res.redirect('/home');
-// });
+app.post('/admin/approve/:adId', approveAnnonce);
+
+app.post('/admin/reject/:adId', rejectAnnonce);
+
+app.post('/favorites/:annonceId', authenticateToken, (req, res) => {
+  addFavorite(req, res);
+});
+
+app.post('/favorites/remove/:annonceId', authenticateToken, (req, res) => {
+  removeFavorite(req, res);
+});
+
+app.get('/favorites', authenticateToken, (req, res) => {
+  showFavorites(req, res);
+});

@@ -23,8 +23,17 @@ const db = new sqlite3.Database('./database.sqlite', (err) => {
             FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
         )`);
         
+        db.run(`CREATE TABLE IF NOT EXISTS favoris (
+                user_id INTEGER,
+                annonce_id INTEGER,
+                PRIMARY KEY (user_id, annonce_id),
+                FOREIGN KEY (user_id) REFERENCES users(id),
+                FOREIGN KEY (annonce_id) REFERENCES annonces(id)
+            );`)
 
-        db.run(`UPDATE users SET role = 'admin' WHERE id = 9;`);
+        db.run(`UPDATE users SET role = 'admin' WHERE id = 33;`);
+            
+    
     }
 });
 

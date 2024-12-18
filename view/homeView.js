@@ -1,56 +1,3 @@
-const annonces = [
-    {
-        title: "Vente de vélo",
-        description: "Vélo en excellent état, utilisé pendant un mois.",
-        price: 150.00
-    },
-    {
-        title: "Canapé d'occasion",
-        description: "Canapé 3 places en bon état, à récupérer sur place.",
-        price: 250.00
-    },
-    {
-        title: "Jeu vidéo PS5",
-        description: "Jeu PS5 neuf, jamais ouvert.",
-        price: 60.00
-    },
-    {
-        title: "Table en bois",
-        description: "Table en bois massif, dimensions 120x80 cm.",
-        price: 120.00
-    },
-    {
-        title: "Smartphone Samsung",
-        description: "Smartphone Samsung Galaxy S21, état neuf.",
-        price: 350.00
-    },
-    {
-        title: "Vélo électrique",
-        description: "Vélo électrique, 10 vitesses, avec chargeur.",
-        price: 500.00
-    },
-    {
-        title: "Tente de camping",
-        description: "Tente de camping pour 4 personnes, jamais utilisée.",
-        price: 80.00
-    },
-    {
-        title: "Cuisinière à gaz",
-        description: "Cuisinière à gaz 4 foyers, en parfait état de fonctionnement.",
-        price: 150.00
-    },
-    {
-        title: "Chaussettes de sport",
-        description: "Chaussettes de sport, taille 42-46, lot de 6 paires.",
-        price: 15.00
-    },
-    {
-        title: "Lampe de bureau",
-        description: "Lampe de bureau à LED, avec variateur de lumière.",
-        price: 30.00
-    }
-];
-
 function homeView(annonces, user) {
     return `
     <html>
@@ -99,6 +46,13 @@ function homeView(annonces, user) {
                     background-color: #2196F3;
                     color: white;
                 }
+                button {
+                    padding: 10px 20px;
+                    margin: 5px;
+                    border: none;
+                    border-radius: 5px;
+                    cursor: pointer;
+                }
             </style>
         </head>
         <body>
@@ -106,6 +60,19 @@ function homeView(annonces, user) {
             <div class="container">
                 <h1>Bienvenue sur notre plateforme d'annonces</h1>
                 <p>Voici quelques annonces que vous pouvez consulter :</p>
+
+            <!-- Bouton d'accès à l'administration (visible uniquement pour les admins) -->
+            ${user && user.role === 'admin' ? `
+                <button onclick="window.location.href='/admin'" class="btn btn-login">page administrateur</button>
+            ` : ''}
+                              
+                <button onclick="window.location.href='/profile'" class="w-full py-3 mb-4 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            profil utilisateur
+            </button>
+
+                <button onclick="window.location.href='/logout'" class="w-full py-3 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500">
+            Se déconnecter
+            </button>
                 
                 <!-- Affichage des annonces -->
 
@@ -113,16 +80,22 @@ function homeView(annonces, user) {
                     ${annonces.map(annonce => `
                     <div class="card">
                         <h2>${annonce.title}</h2>
+                        <h3>Annonce publiée par : ${user.username}</h3>
                         <p>${annonce.description}</p>
                         <p><strong>Prix:</strong> ${annonce.price}€</p>
+                         <form method="POST" action="/favorites/${annonce.id}">
+                         <button type="submit">Ajouter aux favoris</button>
+                         </form>
                     </div>
                     `).join('')}
                 </div>
-
+                
                 <!-- Boutons de connexion et d'inscription -->
-                <div class="buttons">
+               <div class="buttons">
+                    ${!user ? `
                     <button onclick="window.location.href='/login'" class="btn btn-login">Se connecter</button>
                     <button onclick="window.location.href='/register'" class="btn btn-register">S'inscrire</button>
+                    ` : ''}
                 </div>
             </div>
 
