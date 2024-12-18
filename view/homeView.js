@@ -24,6 +24,10 @@ function homeView(annonces, user) {
                     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
                     margin-bottom: 20px;
                 }
+                .card:hover {
+                    transform: scale(1.05);
+                    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+                }
                 .buttons {
                     margin-top: 10px;
                     display: flex;
@@ -42,6 +46,9 @@ function homeView(annonces, user) {
                     background-color: #4CAF50;
                     color: white;
                 }
+                .btn-login:hover {
+                     background-color:rgb(19, 169, 46);
+                    }
                 .btn-register {
                     background-color: #2196F3;
                     color: white;

@@ -26,6 +26,10 @@ function profileView(user, annonces) {
                     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
                     margin-bottom: 20px;
                 }
+                .card:hover {
+                transform: scale(1.05);
+                box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+                }
                 .buttons {
                     margin-top: 10px;
                 }
@@ -84,6 +88,13 @@ function profileView(user, annonces) {
                     cursor: pointer;
                     border-radius: 5px;
                 }
+                    .btn-login {
+                    background-color: #4CAF50;
+                    color: white;
+                }
+                    .btn-login:hover {
+                     background-color:rgb(19, 169, 46);
+                    }
             </style>
         </head>
         <body>

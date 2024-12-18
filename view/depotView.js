@@ -9,7 +9,7 @@ function depotView() {
                 <div class="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
                     <h1 class="text-3xl font-semibold text-center text-gray-800 mb-6">Déposer une annonce</h1>
                     
-                    <form method="POST" action="/depot">
+                    <form method="POST" action="/depot"> 
                         <!-- Champ Titre de l'annonce -->
                         <div class="mb-4">
                             <label for="title" class="block text-sm font-medium text-gray-600">Titre de l'annonce</label>
@@ -30,7 +30,7 @@ function depotView() {
                             <input type="text" name="price" placeholder="Prix de l'article (€) 
                                    class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" required>
                         </div>
-                        
+
                         <!-- Bouton de soumission -->
                         <button type="submit" class="w-full py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                             Déposer l'annonce

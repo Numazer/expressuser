@@ -33,7 +33,7 @@ const db = new sqlite3.Database('./database.sqlite', (err) => {
 
         db.run(`UPDATE users SET role = 'admin' WHERE id = 33;`);
             
-    
+        // db.run(`ALTER TABLE annonces ADD COLUMN image`);
     }
 });
 

@@ -5,7 +5,10 @@ module.exports = {
     './view/loginView.js',
     './view/nav.js',
     './view/profileView.js',
-    './view/registerView.js'
+    './view/registerView.js',
+    './view/adminView.js',
+    './view/favoriteView.js',
+    './view/homeView.js'
   ],
   theme: {
     extend: {},
